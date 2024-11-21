@@ -50,8 +50,9 @@ git clone https://github.com/chainbase-labs/chainbase-avs-setup
 cd chainbase-avs-setup/holesky
 
 # Langkah 4: Membuat Wallet EigenLayer
+# Langkah 4: Membuat Wallet EigenLayer
 echo -e "\033[0;32mCreating EigenLayer Wallet...\033[0m"
-eigenlayer operator keys create --key-type ecdsa opr
+yes | eigenlayer operator keys create --key-type ecdsa opr
 echo -e "\033[0;32mSave your wallet private key securely!\033[0m"
 
 # Optional: Import old key
