@@ -1,19 +1,11 @@
 #!/bin/bash
 
-# Fungsi untuk membuat dan memperbarui file .env
-create_and_update_env() {
-    # Nama file .env
-    ENV_FILE=".env"
+# Fungsi untuk meminta input password dan menyimpan ke file .env
+echo "Masukkan password Eigenlayer yang akan digunakan untuk NODE_ECDSA_KEY_PASSWORD: "
+read -s PASSWORD
 
-    # Memeriksa apakah file .env sudah ada
-    if [ -f "$ENV_FILE" ]; then
-        echo -e "\033[1;33mFile .env already exists. You can update the password.\033[0m"
-    else
-        echo -e "\033[1;32mFile .env not found. Creating a new file...\033[0m"
-        
-        # Membuat file .env baru dengan nilai default
-        cat <<EOL > $ENV_FILE
-# Chainbase AVS Image
+# Menulis ke file .env
+cat > .env <<EOL
 MAIN_SERVICE_IMAGE=repository.chainbase.com/network/chainbase-node:testnet-v0.1.7
 FLINK_TASKMANAGER_IMAGE=flink:latest
 FLINK_JOBMANAGER_IMAGE=flink:latest
@@ -65,20 +57,89 @@ NODE_LOG_PATH_HOST=\${CHAINBASE_AVS_HOME}/logs
 NODE_ECDSA_KEY_FILE_HOST=\${EIGENLAYER_HOME}/operator_keys/opr.ecdsa.key.json
 
 # TODO: Operators need to add password to decrypt the above keys
-NODE_ECDSA_KEY_PASSWORD=***123ABCabc123***
+NODE_ECDSA_KEY_PASSWORD=$PASSWORD
 EOL
-        echo -e "\033[1;32mNew .env file created!\033[0m"
-    fi
 
-    # Meminta pengguna untuk memasukkan password yang mereka buat sebelumnya
-    echo -e "\033[1;34mPlease enter your Eigenlayer wallet password (the one you created earlier):\033[0m"
-    read -s password
+# Menanyakan port yang ingin digunakan
+echo "Masukkan port untuk Flink Job Manager (misalnya 8081): "
+read FLINK_JOB_PORT
 
-    # Mengganti nilai NODE_ECDSA_KEY_PASSWORD di dalam file .env
-    sed -i "s/^NODE_ECDSA_KEY_PASSWORD=.*$/NODE_ECDSA_KEY_PASSWORD=$password/" $ENV_FILE
+echo "Masukkan port untuk Prometheus (misalnya 9091): "
+read PROMETHEUS_PORT
 
-    echo -e "\033[1;32mNODE_ECDSA_KEY_PASSWORD has been updated successfully in .env!\033[0m"
-}
+echo "Masukkan port untuk Chainbase Node (misalnya 8080): "
+read CHAINBASE_NODE_PORT
 
-# Memanggil fungsi untuk membuat dan memperbarui file .env
-create_and_update_env
+echo "Masukkan port untuk Metrics (misalnya 9092): "
+read METRICS_PORT
+
+# Membuat atau mengupdate file docker-compose.yml
+cat > docker-compose.yml <<EOL
+version: '3'
+services:
+  prometheus:
+    image: \${PROMETHEUS_IMAGE}
+    container_name: \${PROMETHEUS_NAME}
+    env_file:
+      - .env
+    volumes:
+      - "\${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
+    command: 
+      - "--enable-feature=expand-external-labels"
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "$PROMETHEUS_PORT:9090"
+    networks:
+      - chainbase
+    restart: unless-stopped
+
+  flink-jobmanager:
+    image: \${FLINK_JOBMANAGER_IMAGE}
+    container_name: \${FLINK_JOBMANAGER_NAME}
+    env_file:
+      - .env
+    ports:
+      - "$FLINK_JOB_PORT:8081"
+    command: jobmanager
+    networks:
+      - chainbase
+    restart: unless-stopped
+
+  flink-taskmanager:
+    image: \${FLINK_JOBMANAGER_IMAGE}
+    container_name: \${FLINK_TASKMANAGER_NAME}
+    env_file:
+      - .env
+    depends_on:
+      - flink-jobmanager
+    command: taskmanager
+    networks:
+      - chainbase
+    restart: unless-stopped
+
+  chainbase-node:
+    image: \${MAIN_SERVICE_IMAGE}
+    container_name: \${MAIN_SERVICE_NAME}
+    command: ["run"]
+    env_file:
+      - .env
+    ports:
+      - "$CHAINBASE_NODE_PORT:8080"
+      - "$METRICS_PORT:9092"
+    volumes:
+      - "\${NODE_ECDSA_KEY_FILE_HOST:-./opr.ecdsa.key.json}:\${NODE_ECDSA_KEY_FILE}"
+      - "\${NODE_LOG_PATH_HOST}:\${NODE_LOG_DIR}:rw"
+    depends_on:
+      - prometheus
+      - flink-jobmanager
+      - flink-taskmanager
+    networks:
+      - chainbase
+    restart: unless-stopped
+
+networks:
+  chainbase:
+    driver: bridge
+EOL
+
+echo "File .env dan docker-compose.yml telah berhasil dibuat dan diperbarui."
