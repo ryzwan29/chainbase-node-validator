@@ -1,8 +1,8 @@
 ```
-source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/script/main/quick-installation.sh)
+source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/main/script/quick-installation.sh)
 ```
 ```
-source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/script/main/wallet.sh)
+source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/main/script/wallet.sh)
 ```
 ```
 eigenlayer operator config create
@@ -26,7 +26,7 @@ eigenlayer operator register operator.yaml
 eigenlayer operator status operator.yaml
 ```
 ```
-source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/script/main/main-script.sh)
+source <(curl -s https://raw.githubusercontent.com/ryzwan29/chainbase-node-validator/main/script/main-script.sh)
 ```
 ```
 source .env && mkdir -pv ${EIGENLAYER_HOME} ${CHAINBASE_AVS_HOME} ${NODE_LOG_PATH_HOST}
