@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# Fungsi untuk mencetak teks dengan warna
+green_echo() {
+    echo -e "\e[32m$1\e[0m"
+}
+
+blue_echo() {
+    echo -e "\e[34m$1\e[0m"
+}
+
 # Fungsi untuk membuat file .env
-echo "Membuat file .env..."
-echo "Masukkan password Eigenlayer yang telah dibuat : "
+green_echo "Membuat file .env..."
+echo "Masukkan password Eigenlayer yang akan digunakan untuk NODE_ECDSA_KEY_PASSWORD: "
 read -s PASSWORD
 
 # Menulis ke file .env
@@ -61,11 +70,11 @@ NODE_ECDSA_KEY_FILE_HOST=\${EIGENLAYER_HOME}/operator_keys/opr.ecdsa.key.json
 NODE_ECDSA_KEY_PASSWORD=$PASSWORD
 EOL
 
-echo "File .env telah berhasil dibuat."
+blue_echo "File .env telah berhasil dibuat."
 
 # Menanyakan port yang ingin digunakan, dengan pengaturan default
-echo "Sekarang kita akan mengatur port yang digunakan untuk layanan."
-echo "Jika Anda ingin menggunakan port default, cukup tekan ENTER."
+green_echo "Sekarang kita akan mengatur port yang digunakan untuk layanan."
+green_echo "Jika Anda ingin menggunakan port default, cukup tekan ENTER."
 
 # Default ports
 DEFAULT_FLINK_JOB_PORT=8081
@@ -90,7 +99,7 @@ echo "Masukkan port untuk Metrics (default: $DEFAULT_METRICS_PORT): "
 read METRICS_PORT
 METRICS_PORT=${METRICS_PORT:-$DEFAULT_METRICS_PORT}
 
-echo "Membuat file docker-compose.yml..."
+blue_echo "Membuat file docker-compose.yml..."
 
 # Membuat atau mengupdate file docker-compose.yml
 cat > docker-compose.yml <<EOL
@@ -161,4 +170,4 @@ networks:
     driver: bridge
 EOL
 
-echo "File docker-compose.yml telah berhasil dibuat."
+blue_echo "File docker-compose.yml telah berhasil dibuat."
