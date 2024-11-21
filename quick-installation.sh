@@ -53,18 +53,23 @@ cd chainbase-avs-setup/holesky
 # Langkah 4: Membuat Wallet EigenLayer
 echo -e "\033[0;32mCreating EigenLayer Wallet...\033[0m"
 
+# Menonaktifkan echo (agar password tidak terlihat di terminal)
+stty -echo
+
 # Menangani input otomatis dengan expect
 expect <<EOF
 spawn eigenlayer operator keys create --key-type ecdsa opr
-# Tunggu prompt untuk password
-expect "Enter your password:" { send "your_password\r" }
-# Tunggu prompt konfirmasi password
-expect "Confirm your password:" { send "your_password\r" }
-# Tunggu hingga proses selesai
+expect "Enter password to encrypt the ecdsa private key:" { send "your_password\r" }
+expect "Confirm password:" { send "your_password\r" }
 expect eof
 EOF
 
+# Mengaktifkan kembali echo setelah input selesai
+stty echo
+
+# Memberikan pesan ke user
 echo -e "\033[0;32mSave your wallet private key securely!\033[0m"
+
 
 # Optional: Import old key
 # echo -e "\033[0;32mImporting old key...\033[0m"
