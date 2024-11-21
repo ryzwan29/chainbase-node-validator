@@ -171,3 +171,6 @@ networks:
 EOL
 
 blue_echo "File docker-compose.yml telah berhasil dibuat."
+
+green_echo "Menjalankan docker compose di background"
+docker compose up -d
