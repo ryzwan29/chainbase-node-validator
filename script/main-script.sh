@@ -82,7 +82,7 @@ DEFAULT_PROMETHEUS_PORT=9091
 DEFAULT_CHAINBASE_NODE_PORT=8080
 DEFAULT_METRICS_PORT=9092
 
-# Menanyakan port dengan fallback ke default jika tidak diisi
+# Setting custom port
 echo "Masukkan port untuk Flink Job Manager (default: $DEFAULT_FLINK_JOB_PORT): "
 read FLINK_JOB_PORT
 FLINK_JOB_PORT=${FLINK_JOB_PORT:-$DEFAULT_FLINK_JOB_PORT}
@@ -101,7 +101,7 @@ METRICS_PORT=${METRICS_PORT:-$DEFAULT_METRICS_PORT}
 
 blue_echo "Membuat file docker-compose.yml..."
 
-# Membuat atau mengupdate file docker-compose.yml
+# Create docker compose
 cat > docker-compose.yml <<EOL
 version: '3'
 services:
@@ -110,8 +110,8 @@ services:
     container_name: ${PROMETHEUS_NAME}
     env_file:
       - .env
-#    volumes:
-#      - "${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
+    volumes:
+      - "${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
     command:
       - "--enable-feature=expand-external-labels"
       - "--config.file=/etc/prometheus/prometheus.yml"
