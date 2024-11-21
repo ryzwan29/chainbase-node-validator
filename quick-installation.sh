@@ -50,7 +50,6 @@ git clone https://github.com/chainbase-labs/chainbase-avs-setup
 cd chainbase-avs-setup/holesky
 
 # Langkah 4: Membuat Wallet EigenLayer
-# Langkah 4: Membuat Wallet EigenLayer
 echo -e "\033[0;32mCreating EigenLayer Wallet...\033[0m"
 
 # Menonaktifkan echo (agar password tidak terlihat di terminal)
@@ -59,8 +58,20 @@ stty -echo
 # Menangani input otomatis dengan expect
 expect <<EOF
 spawn eigenlayer operator keys create --key-type ecdsa opr
+
+# Tunggu prompt untuk password
 expect "Enter password to encrypt the ecdsa private key:" { send "your_password\r" }
+
+# Tunggu prompt konfirmasi password
 expect "Confirm password:" { send "your_password\r" }
+
+# Tangkap prompt apapun yang meminta konfirmasi (y/N)
+expect {
+    "Would you like to populate the operator config file? (y/N)" { send "y\r" }
+    "y/N" { send "y\r" }  # Agar menanggapi prompt apapun yang berisi 'y/N'
+}
+
+# Tunggu hingga proses selesai
 expect eof
 EOF
 
