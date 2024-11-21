@@ -110,8 +110,8 @@ services:
     container_name: ${PROMETHEUS_NAME}
     env_file:
       - .env
-    volumes:
-      - "${PROMETHEUS_CONFIG_PATH}:/etc/prometheus"
+#    volumes:
+#      - "${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
     command:
       - "--enable-feature=expand-external-labels"
       - "--config.file=/etc/prometheus/prometheus.yml"
