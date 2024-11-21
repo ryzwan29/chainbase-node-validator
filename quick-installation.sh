@@ -12,6 +12,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y ca-certificates zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev curl git wget make jq build-essential pkg-config lsb-release libssl-dev libreadline-dev libffi-dev gcc screen unzip lz4
 
 # Install Docker
+echo -e "\033[0;32mAdd repository and Installing Docker...\033[0m"
 apt-get update
 apt-get install ca-certificates curl
 install -m 0755 -d /etc/apt/keyrings
