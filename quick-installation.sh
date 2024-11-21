@@ -2,17 +2,17 @@
 
 # Pastikan script dijalankan sebagai root atau dengan sudo
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root" 
+    echo -e "\033[0;31mThis script must be run as root\033[0m" 
     exit 1
 fi
 
 # Langkah 1: Memperbarui dan Menginstal Dependensi
-echo "Updating and Installing dependencies..."
+echo -e "\033[0;32mUpdating and Installing dependencies...\033[0m"
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y ca-certificates zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev curl git wget make jq build-essential pkg-config lsb-release libssl-dev libreadline-dev libffi-dev gcc screen unzip lz4
 
 # Install Docker
-echo "Installing Docker..."
+echo -e "\033[0;32mInstalling Docker...\033[0m"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
@@ -20,14 +20,14 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 docker version
 
 # Install Docker-Compose
-echo "Installing Docker-Compose..."
+echo -e "\033[0;32mInstalling Docker-Compose...\033[0m"
 VER=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)
 curl -L "https://github.com/docker/compose/releases/download/$VER/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 
 # Install Go
-echo "Installing Go..."
+echo -e "\033[0;32mInstalling Go...\033[0m"
 sudo rm -rf /usr/local/go
 curl -L https://go.dev/dl/go1.22.4.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
 echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
@@ -36,40 +36,40 @@ source ~/.bash_profile
 go version
 
 # Langkah 2: Install EigenLayer CLI
-echo "Installing EigenLayer CLI..."
+echo -e "\033[0;32mInstalling EigenLayer CLI...\033[0m"
 curl -sSfL https://raw.githubusercontent.com/layr-labs/eigenlayer-cli/master/scripts/install.sh | sh -s
 export PATH=$PATH:~/bin
 eigenlayer --version
 
 # Langkah 3: Clone Repo Chainbase AVS
-echo "Cloning Chainbase AVS repository..."
+echo -e "\033[0;32mCloning Chainbase AVS repository...\033[0m"
 git clone https://github.com/chainbase-labs/chainbase-avs-setup
 cd chainbase-avs-setup/holesky
 
 # Langkah 4: Membuat Wallet EigenLayer
-echo "Creating EigenLayer Wallet..."
+echo -e "\033[0;32mCreating EigenLayer Wallet...\033[0m"
 eigenlayer operator keys create --key-type ecdsa opr
-echo "Save your wallet private key securely!"
+echo -e "\033[0;32mSave your wallet private key securely!\033[0m"
 
 # Optional: Import old key
-# echo "Importing old key..."
+# echo -e "\033[0;32mImporting old key...\033[0m"
 # eigenlayer operator keys import --key-type ecdsa opr PRIVATEKEY
 
 # Langkah 5: Mendaftarkan Operator
-echo "Configuring and Registering Operator..."
+echo -e "\033[0;32mConfiguring and Registering Operator...\033[0m"
 eigenlayer operator config create
 
 # Langkah 6: Edit metadata.json
-echo "Editing metadata.json..."
+echo -e "\033[0;32mEditing metadata.json...\033[0m"
 nano metadata.json
 
 # Langkah 7: Menjalankan EigenLayer Holesky Node
-echo "Registering and Running Holesky Node..."
+echo -e "\033[0;32mRegistering and Running Holesky Node...\033[0m"
 eigenlayer operator register operator.yaml
 eigenlayer operator status operator.yaml
 
 # Langkah 8: Konfigurasi Chainbase AVS
-echo "Creating .env file for Chainbase AVS..."
+echo -e "\033[0;32mCreating .env file for Chainbase AVS...\033[0m"
 cat <<EOL > .env
 # Chainbase AVS Image
 MAIN_SERVICE_IMAGE=repository.chainbase.com/network/chainbase-node:testnet-v0.1.7
@@ -127,7 +127,7 @@ NODE_ECDSA_KEY_FILE_HOST=\${EIGENLAYER_HOME}/operator_keys/opr.ecdsa.key.json
 NODE_ECDSA_KEY_PASSWORD=***123ABCabc123***
 EOL
 
-echo "Creating docker-compose.yml file..."
+echo -e "\033[0;32mCreating docker-compose.yml file...\033[0m"
 cat <<EOL > docker-compose.yml
 services:
   prometheus:
@@ -196,15 +196,15 @@ networks:
 EOL
 
 # Langkah 9: Membuat folder untuk docker
-echo "Creating folders for Docker..."
+echo -e "\033[0;32mCreating folders for Docker...\033[0m"
 source .env && mkdir -pv \${EIGENLAYER_HOME} \${CHAINBASE_AVS_HOME} \${NODE_LOG_PATH_HOST}
 
 # Langkah 10: Menjalankan Chainbase AVS
-echo "Running Chainbase AVS..."
+echo -e "\033[0;32mRunning Chainbase AVS...\033[0m"
 chmod +x ./chainbase-avs.sh
 ./chainbase-avs.sh register
 ./chainbase-avs.sh run
 
 # Langkah 11: Memeriksa Kesehatan AVS
-echo "Checking Chainbase Node Logs..."
+echo -e "\033[0;32mChecking Chainbase Node Logs...\033[0m"
 docker compose logs chainbase-node -f
