@@ -9,7 +9,7 @@ fi
 # Langkah 1: Memperbarui dan Menginstal Dependensi
 echo -e "\033[0;32mUpdating and Installing dependencies...\033[0m"
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y ca-certificates zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev curl git wget make jq build-essential pkg-config lsb-release libssl-dev libreadline-dev libffi-dev gcc screen unzip lz4
+sudo apt install -y ca-certificates zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev curl git wget make jq build-essential pkg-config lsb-release libssl-dev libreadline-dev libffi-dev gcc screen unzip lz4 expect
 
 # Install Docker
 echo -e "\033[0;32mAdd repository and Installing Docker...\033[0m"
@@ -52,7 +52,18 @@ cd chainbase-avs-setup/holesky
 # Langkah 4: Membuat Wallet EigenLayer
 # Langkah 4: Membuat Wallet EigenLayer
 echo -e "\033[0;32mCreating EigenLayer Wallet...\033[0m"
-yes | eigenlayer operator keys create --key-type ecdsa opr
+
+# Menangani input otomatis dengan expect
+expect <<EOF
+spawn eigenlayer operator keys create --key-type ecdsa opr
+# Tunggu prompt untuk password
+expect "Enter your password:" { send "your_password\r" }
+# Tunggu prompt konfirmasi password
+expect "Confirm your password:" { send "your_password\r" }
+# Tunggu hingga proses selesai
+expect eof
+EOF
+
 echo -e "\033[0;32mSave your wallet private key securely!\033[0m"
 
 # Optional: Import old key
