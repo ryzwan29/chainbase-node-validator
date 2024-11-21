@@ -11,7 +11,7 @@ blue_echo() {
 
 # Fungsi untuk membuat file .env
 green_echo "Membuat file .env..."
-echo "Masukkan password Eigenlayer yang akan digunakan untuk NODE_ECDSA_KEY_PASSWORD: "
+echo "Masukkan password Eigenlayer kamu : "
 read -s PASSWORD
 
 # Menulis ke file .env
