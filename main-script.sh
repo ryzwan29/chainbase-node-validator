@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Fungsi untuk meminta input password dan menyimpan ke file .env
-echo "Masukkan password Eigenlayer yang akan digunakan untuk NODE_ECDSA_KEY_PASSWORD: "
+# Fungsi untuk membuat file .env
+echo "Membuat file .env..."
+echo "Masukkan password Eigenlayer yang telah dibuat : "
 read -s PASSWORD
 
 # Menulis ke file .env
@@ -60,18 +61,36 @@ NODE_ECDSA_KEY_FILE_HOST=\${EIGENLAYER_HOME}/operator_keys/opr.ecdsa.key.json
 NODE_ECDSA_KEY_PASSWORD=$PASSWORD
 EOL
 
-# Menanyakan port yang ingin digunakan
-echo "Masukkan port untuk Flink Job Manager (misalnya 8081): "
+echo "File .env telah berhasil dibuat."
+
+# Menanyakan port yang ingin digunakan, dengan pengaturan default
+echo "Sekarang kita akan mengatur port yang digunakan untuk layanan."
+echo "Jika Anda ingin menggunakan port default, cukup tekan ENTER."
+
+# Default ports
+DEFAULT_FLINK_JOB_PORT=8081
+DEFAULT_PROMETHEUS_PORT=9091
+DEFAULT_CHAINBASE_NODE_PORT=8080
+DEFAULT_METRICS_PORT=9092
+
+# Menanyakan port dengan fallback ke default jika tidak diisi
+echo "Masukkan port untuk Flink Job Manager (default: $DEFAULT_FLINK_JOB_PORT): "
 read FLINK_JOB_PORT
+FLINK_JOB_PORT=${FLINK_JOB_PORT:-$DEFAULT_FLINK_JOB_PORT}
 
-echo "Masukkan port untuk Prometheus (misalnya 9091): "
+echo "Masukkan port untuk Prometheus (default: $DEFAULT_PROMETHEUS_PORT): "
 read PROMETHEUS_PORT
+PROMETHEUS_PORT=${PROMETHEUS_PORT:-$DEFAULT_PROMETHEUS_PORT}
 
-echo "Masukkan port untuk Chainbase Node (misalnya 8080): "
+echo "Masukkan port untuk Chainbase Node (default: $DEFAULT_CHAINBASE_NODE_PORT): "
 read CHAINBASE_NODE_PORT
+CHAINBASE_NODE_PORT=${CHAINBASE_NODE_PORT:-$DEFAULT_CHAINBASE_NODE_PORT}
 
-echo "Masukkan port untuk Metrics (misalnya 9092): "
+echo "Masukkan port untuk Metrics (default: $DEFAULT_METRICS_PORT): "
 read METRICS_PORT
+METRICS_PORT=${METRICS_PORT:-$DEFAULT_METRICS_PORT}
+
+echo "Membuat file docker-compose.yml..."
 
 # Membuat atau mengupdate file docker-compose.yml
 cat > docker-compose.yml <<EOL
@@ -142,4 +161,4 @@ networks:
     driver: bridge
 EOL
 
-echo "File .env dan docker-compose.yml telah berhasil dibuat dan diperbarui."
+echo "File docker-compose.yml telah berhasil dibuat."
