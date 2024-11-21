@@ -106,12 +106,12 @@ cat > docker-compose.yml <<EOL
 version: '3'
 services:
   prometheus:
-    image: \${PROMETHEUS_IMAGE}
-    container_name: \${PROMETHEUS_NAME}
+    image: ${PROMETHEUS_IMAGE}
+    container_name: ${PROMETHEUS_NAME}
     env_file:
       - .env
     volumes:
-      - "\${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
+      - "${PROMETHEUS_CONFIG_PATH}:/etc/prometheus/prometheus.yml"
     command:
       - "--enable-feature=expand-external-labels"
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -122,8 +122,8 @@ services:
     restart: unless-stopped
 
   flink-jobmanager:
-    image: \${FLINK_JOBMANAGER_IMAGE}
-    container_name: \${FLINK_JOBMANAGER_NAME}
+    image: ${FLINK_JOBMANAGER_IMAGE}
+    container_name: ${FLINK_JOBMANAGER_NAME}
     env_file:
       - .env
     ports:
@@ -134,8 +134,8 @@ services:
     restart: unless-stopped
 
   flink-taskmanager:
-    image: \${FLINK_JOBMANAGER_IMAGE}
-    container_name: \${FLINK_TASKMANAGER_NAME}
+    image: ${FLINK_JOBMANAGER_IMAGE}
+    container_name: ${FLINK_TASKMANAGER_NAME}
     env_file:
       - .env
     depends_on:
@@ -146,8 +146,8 @@ services:
     restart: unless-stopped
 
   chainbase-node:
-    image: \${MAIN_SERVICE_IMAGE}
-    container_name: \${MAIN_SERVICE_NAME}
+    image: ${MAIN_SERVICE_IMAGE}
+    container_name: ${MAIN_SERVICE_NAME}
     command: ["run"]
     env_file:
       - .env
